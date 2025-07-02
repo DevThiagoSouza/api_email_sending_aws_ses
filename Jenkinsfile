@@ -59,4 +59,35 @@ pipeline {
             }
         }
 
-        stage('A
+        stage('Aprovação para Produção') {
+            when {
+                branch 'main'
+            }
+            steps {
+                input message: "Aprovar deploy para produção?"
+            }
+        }
+
+        stage('Deploy Produção') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo "Deploy para produção"
+                // sh './deploy-prod.sh'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finalizada.'
+        }
+        success {
+            echo '✅ Sucesso!'
+        }
+        failure {
+            echo '❌ Falhou.'
+        }
+    }
+}
