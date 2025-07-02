@@ -1,11 +1,7 @@
 pipeline {
     agent any
 
-    environment {
-        JAVA_HOME = tool name: 'jdk-21', type: 'jdk'
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
-        MAVEN_HOME = tool name: 'Maven 3.9.6'
-    }
+
 
     options {
         skipStagesAfterUnstable()
