@@ -3,33 +3,39 @@ pipeline {
 
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Build') {
+        stage('build') {
             steps {
                 sh 'mvn clean compile'
             }
         }
 
-        stage('Test') {
+        stage('test: integration & quality') {
             steps {
-                sh 'mvn test'
+                sh 'mvn verify' // ou sonar, cobertura, etc
             }
         }
 
-        stage('Package') {
+        stage('test: functional') {
             steps {
-                sh 'mvn package -DskipTests'
+                sh './run-functional-tests.sh' // exemplo
             }
         }
 
-        stage('Deploy Simulado') {
+        stage('test: load & security') {
             steps {
-                echo 'Simulando deploy do JAR gerado...'
+                sh './run-load-tests.sh' // exemplo
+            }
+        }
+
+        stage('approval') {
+            steps {
+                input message: "Aprovar para produção?"
+            }
+        }
+
+        stage('deploy: prod') {
+            steps {
+                sh './deploy-prod.sh' // exemplo
             }
         }
     }
