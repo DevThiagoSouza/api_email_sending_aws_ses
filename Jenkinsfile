@@ -1,12 +1,12 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Build') {
-            steps {
-                sh 'mvn clean compile'
-            }
-        }
+    environment {
+        JAVA_HOME = tool name: 'jdk-21', type: 'jdk'
+        PATH = "${JAVA_HOME}/bin:${env.PATH}"
+        MAVEN_HOME = tool name: 'Maven 3.9.6'
+    }
+
     options {
         skipStagesAfterUnstable()
         timestamps()
@@ -21,7 +21,6 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo "Compilando o projeto..."
                 sh "${MAVEN_HOME}/bin/mvn clean compile"
             }
         }
@@ -39,7 +38,7 @@ pipeline {
             }
             steps {
                 echo "Simulando análise de qualidade..."
-                // Exemplo: sh "mvn sonar:sonar"
+                // Exemplo real: sh "${MAVEN_HOME}/bin/mvn sonar:sonar"
             }
         }
 
@@ -56,39 +55,8 @@ pipeline {
             }
             steps {
                 echo "Deploy para ambiente de homologação"
-                // Simulado: sh './deploy-hml.sh'
+                // sh './deploy-hml.sh'
             }
         }
 
-        stage('Aprovação para Produção') {
-            when {
-                branch 'main'
-            }
-            steps {
-                input message: "Aprovar deploy para produção?"
-            }
-        }
-
-        stage('Deploy Produção') {
-            when {
-                branch 'main'
-            }
-            steps {
-                echo "Deploy para produção"
-                // Simulado: sh './deploy-prod.sh'
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline finalizada.'
-        }
-        success {
-            echo '✅ Sucesso!'
-        }
-        failure {
-            echo '❌ Falhou.'
-        }
-    }
-}
+        stage('A
