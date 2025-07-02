@@ -17,14 +17,14 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh "${MAVEN_HOME}/bin/mvn clean compile"
+                sh "./mvnw clean compile"
             }
         }
 
         stage('Testes Unitários') {
             steps {
                 echo "Executando testes unitários..."
-                sh "${MAVEN_HOME}/bin/mvn test"
+                sh "./mvnw test"
             }
         }
 
@@ -41,7 +41,7 @@ pipeline {
         stage('Empacotar') {
             steps {
                 echo "Empacotando JAR..."
-                sh "${MAVEN_HOME}/bin/mvn package -DskipTests"
+                sh "./mvnw package -DskipTests"
             }
         }
 
