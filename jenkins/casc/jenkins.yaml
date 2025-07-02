@@ -1,0 +1,51 @@
+jenkins:
+  systemMessage: "✅ Jenkins Maven DSL configurado via JCasC"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "${JENKINS_ADMIN_ID}"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  jobs:
+    - script: >
+        pipelineJob('meu-pipeline-maven') {
+          definition {
+            cpsScm {
+              scm {
+                git {
+                  remote {
+                    url('https://github.com/DevThiagoSouza/api_email_sending_aws_ses.git')
+                  }
+                  branches('main')
+                }
+                scriptPath('Jenkinsfile')
+              }
+            }
+          }
+        }
+
+unclassified:
+  location:
+    url: http://localhost:8080/
+
+tools:
+  maven:
+    installations:
+      - name: "Maven 3.9.6"
+        home: "/opt/maven"
+  jdk:
+    installations:
+      - name: "jdk-17"
+        home: "/opt/java/openjdk"
+
+plugins:
+  required:
+    - configuration-as-code
+    - job-dsl
+    - git
+    - workflow-aggregator
+    - maven-plugin
