@@ -1,42 +1,97 @@
 pipeline {
     agent any
+environment {
+    MAVEN_HOME = tool name: 'Maven 3.9.6'
+}
+...
+stage('Build') {
+    steps {
+        sh "${MAVEN_HOME}/bin/mvn clean compile"
+    }
+}
 
+    options {
+        skipStagesAfterUnstable()
+        timestamps()
+    }
 
     stages {
-        stage('build') {
+        stage('Checkout') {
             steps {
-                sh 'mvn clean compile'
+                checkout scm
             }
         }
 
-        stage('test: integration & quality') {
+        stage('Build') {
             steps {
-                sh 'mvn verify' // ou sonar, cobertura, etc
+                echo "Compilando o projeto..."
+                sh "${MAVEN_HOME}/bin/mvn clean compile"
             }
         }
 
-        stage('test: functional') {
+        stage('Testes Unitários') {
             steps {
-                sh './run-functional-tests.sh' // exemplo
+                echo "Executando testes unitários..."
+                sh "${MAVEN_HOME}/bin/mvn test"
             }
         }
 
-        stage('test: load & security') {
+        stage('SonarQube Quality Gate') {
+            when {
+                branch 'develop'
+            }
             steps {
-                sh './run-load-tests.sh' // exemplo
+                echo "Simulando análise de qualidade..."
+                // Exemplo: sh "mvn sonar:sonar"
             }
         }
 
-        stage('approval') {
+        stage('Empacotar') {
             steps {
-                input message: "Aprovar para produção?"
+                echo "Empacotando JAR..."
+                sh "${MAVEN_HOME}/bin/mvn package -DskipTests"
             }
         }
 
-        stage('deploy: prod') {
-            steps {
-                sh './deploy-prod.sh' // exemplo
+        stage('Deploy Homologação') {
+            when {
+                branch 'develop'
             }
+            steps {
+                echo "Deploy para ambiente de homologação"
+                // Simulado: sh './deploy-hml.sh'
+            }
+        }
+
+        stage('Aprovação para Produção') {
+            when {
+                branch 'main'
+            }
+            steps {
+                input message: "Aprovar deploy para produção?"
+            }
+        }
+
+        stage('Deploy Produção') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo "Deploy para produção"
+                // Simulado: sh './deploy-prod.sh'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finalizada.'
+        }
+        success {
+            echo '✅ Sucesso!'
+        }
+        failure {
+            echo '❌ Falhou.'
         }
     }
 }
