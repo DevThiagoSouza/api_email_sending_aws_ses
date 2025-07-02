@@ -28,20 +28,12 @@ pipeline {
             }
         }
 
-        stage('SonarQube Quality Gate') {
-            when {
-                branch 'develop'
-            }
-            steps {
-                echo "Simulando análise de qualidade..."
-                // Exemplo real: sh "${MAVEN_HOME}/bin/mvn sonar:sonar"
-            }
-        }
+    
 
         stage('Empacotar') {
             steps {
                 echo "Empacotando JAR..."
-                sh "./mvnw package -DskipTests"
+                sh "./mvnw clean package -DskipTests"
             }
         }
 
