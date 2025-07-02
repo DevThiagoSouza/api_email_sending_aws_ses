@@ -1,17 +1,12 @@
 pipeline {
     agent any
-   environment {
-        MAVEN_HOME = tool name: 'Maven 3.9.6'
-        JAVA_HOME = tool name: 'jdk-21', type: 'jdk'
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
-    }
 
     stages {
         stage('Build') {
             steps {
-                sh "${MAVEN_HOME}/bin/mvn clean compile"
+                sh 'mvn clean compile'
             }
-
+        }
     options {
         skipStagesAfterUnstable()
         timestamps()
